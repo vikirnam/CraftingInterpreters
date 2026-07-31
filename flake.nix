@@ -35,9 +35,9 @@
         in
         {
           inherit jdk;
-          maven = prev.maven.override { jdk_headless = jdk; };
-          gradle = prev.gradle.override { java = jdk; };
-          lombok = prev.lombok.override { inherit jdk; };
+          # maven = prev.maven.override { jdk_headless = jdk; };
+          # gradle = prev.gradle.override { java = jdk; };
+          # lombok = prev.lombok.override { inherit jdk; };
         };
 
       devShells = forEachSupportedSystem (
@@ -46,16 +46,19 @@
           default = pkgs.mkShellNoCC {
             packages = with pkgs; [
               gcc
-              gradle
+              # gradle
               jdk
-              maven
+              # maven
               ncurses
               patchelf
               zlib
+              jdt-language-server
 
               zig
               zls
               self.formatter.${system}
+
+              rlwrap
             ];
 
             # shellHook =
