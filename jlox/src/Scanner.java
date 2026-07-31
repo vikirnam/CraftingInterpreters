@@ -84,6 +84,9 @@ class Scanner {
       case '/':
         if (match('/')) {
           while (peek() != '\n' && !isAtEnd()) advance();
+        } else if (match('*')) {
+          blockComment();
+          break;
         } else {
           addToken(TokenType.SLASH);
         }
@@ -145,6 +148,25 @@ class Scanner {
     }
 
     addToken(TokenType.NUMBER, source.subSequence(start, current));
+  }
+
+  private void blockComment() {
+    int level = 1;
+    while (!isAtEnd()) {
+      if (peek() == '/' && peekNext() == '*') {
+        advance();
+        level++;
+      } else if (peek() == '*' && peekNext() == '/') {
+          advance();
+        if (--level == 0) {
+          advance();
+          break;
+        }
+      } else if (peek() == '\n') {
+        line++;
+      }
+      advance();
+    }
   }
 
   private char advance() {
