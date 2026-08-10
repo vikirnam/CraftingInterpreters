@@ -58,6 +58,9 @@
               zls
               self.formatter.${system}
 
+              bear
+              clang-tools
+
               rlwrap
             ];
 
