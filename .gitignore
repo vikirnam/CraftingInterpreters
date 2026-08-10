@@ -1,4 +1,6 @@
 .direnv
 bin
 tests
+.zig-cache
+zig-out
 
