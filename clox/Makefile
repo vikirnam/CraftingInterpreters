@@ -3,7 +3,7 @@ CC := cc $(CFLAGS)
 
 .PHONY: clean
 
-clox: main.o chunk.o memory.o debug.o value.o vm.o
+clox: main.o chunk.o memory.o debug.o value.o vm.o compiler.o scanner.o | build
 	$(CC) -o build/$@ $(addprefix build/,$^)
 
 main.o: src/main.c | build
@@ -24,6 +24,11 @@ value.o: src/value.c | build
 vm.o: src/vm.c | build
 	$(CC) -c -o build/$@ $^
 
+compiler.o: src/compiler.c | build
+	$(CC) -c -o build/$@ $^
+
+scanner.o: src/scanner.c | build
+	$(CC) -c -o build/$@ $^
 
 build:
 	mkdir -p build
