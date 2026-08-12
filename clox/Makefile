@@ -3,6 +3,9 @@ CC := cc $(CFLAGS)
 
 .PHONY: clean
 
+run: clox
+	rlwrap ./build/clox
+
 clox: main.o chunk.o memory.o debug.o value.o vm.o compiler.o scanner.o | build
 	$(CC) -o build/$@ $(addprefix build/,$^)
 
