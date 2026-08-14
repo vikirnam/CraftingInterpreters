@@ -2,9 +2,12 @@
 #include "chunk.h"
 #include "debug.h"
 #include "compiler.h"
+#include "memory.h"
+#include "object.h"
 #include "value.h"
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
 
 VM vm;
 
@@ -30,10 +33,12 @@ static void runtimeError(const char *format, ...)
 void initVM(void)
 {
 	resetStack();
+	vm.objects = NULL;
 }
 
 void freeVM(void)
 {
+	freeObjects();
 }
 
 void push(Value value)
@@ -56,6 +61,20 @@ static Value peek(int distance)
 static bool isFalsey(Value value)
 {
 	return IS_NIL(value) || (IS_BOOL(value) && !AS_BOOL(value));
+}
+
+static void concatenate(void) {
+	ObjString *b = AS_STRING(pop());
+	ObjString *a = AS_STRING(pop());
+
+	int len = a->len + b->len;
+	char *chars = ALLOCATE(char, len + 1);
+	memcpy(chars, a->chars, a->len);
+	memcpy(chars + a->len, b->chars, b->len);
+	chars[len] = '\0';
+
+	ObjString *result = takeString(chars, len);
+	push(OBJ_VAL(result));
 }
 
 static InterpretResult run(void)
@@ -112,17 +131,27 @@ static InterpretResult run(void)
 		case OP_LESS:
 			BINARY_OP(BOOL_VAL, <);
 			break;
-		case OP_ADD:
-			BINARY_OP(NUMBER_VALUE, +);
-			break;
+		case OP_ADD: {
+			if (IS_STRING(peek(0)) && IS_STRING(peek(1))) {
+				concatenate();
+			} else if (IS_NUMBER(peek(0)) && IS_NUMBER(peek(1))) {
+				double b = AS_NUMBER(pop());
+				double a = AS_NUMBER(pop());
+				push(NUMBER_VAL(a + b));
+			} else {
+				runtimeError("Operands must be two numbers or two strings.");
+				return INTERPRET_RUNTIME_ERROR;
+			}
+		}
+		break;
 		case OP_SUBTRACT:
-			BINARY_OP(NUMBER_VALUE, -);
+			BINARY_OP(NUMBER_VAL, -);
 			break;
 		case OP_MULTIPLY:
-			BINARY_OP(NUMBER_VALUE, *);
+			BINARY_OP(NUMBER_VAL, *);
 			break;
 		case OP_DIVIDE:
-			BINARY_OP(NUMBER_VALUE, /);
+			BINARY_OP(NUMBER_VAL, /);
 			break;
 		case OP_NOT:
 			push(BOOL_VAL(isFalsey(pop())));
@@ -132,7 +161,7 @@ static InterpretResult run(void)
 				runtimeError("Operand must be a number.");
 				return INTERPRET_RUNTIME_ERROR;
 			}
-			push(NUMBER_VALUE(-AS_NUMBER(pop())));
+			push(NUMBER_VAL(-AS_NUMBER(pop())));
 			break;
 		case OP_RETURN: {
 			printValue(pop());
