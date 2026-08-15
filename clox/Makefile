@@ -6,7 +6,7 @@ CC := cc $(CFLAGS)
 run: clox
 	rlwrap ./build/clox
 
-clox: main.o chunk.o memory.o debug.o value.o vm.o compiler.o scanner.o object.o| build
+clox: main.o chunk.o memory.o debug.o value.o vm.o compiler.o scanner.o object.o table.o | build
 	$(CC) -o build/$@ $(addprefix build/,$^)
 
 main.o: src/main.c | build
@@ -34,6 +34,9 @@ scanner.o: src/scanner.c | build
 	$(CC) -c -o build/$@ $^
 
 object.o: src/object.c | build
+	$(CC) -c -o build/$@ $^
+
+table.o: src/table.c | build
 	$(CC) -c -o build/$@ $^
 
 build:

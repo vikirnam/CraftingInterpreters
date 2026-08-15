@@ -4,6 +4,7 @@
 #include "compiler.h"
 #include "memory.h"
 #include "object.h"
+#include "table.h"
 #include "value.h"
 #include <stdarg.h>
 #include <stdio.h>
@@ -34,10 +35,12 @@ void initVM(void)
 {
 	resetStack();
 	vm.objects = NULL;
+	initTable(&vm.strings);
 }
 
 void freeVM(void)
 {
+	freeTable(&vm.strings);
 	freeObjects();
 }
 
