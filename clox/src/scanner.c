@@ -222,7 +222,7 @@ Token scanToken(void)
 	case '{':
 		return makeToken(TOKEN_LEFT_BRACE);
 	case '}':
-		return makeToken(TOKEN_LEFT_BRACE);
+		return makeToken(TOKEN_RIGHT_BRACE);
 	case ';':
 		return makeToken(TOKEN_SEMICOLON);
 	case ',':
