@@ -1,4 +1,4 @@
-CFLAGS := -Wall -Werror -Wpedantic -O2
+CFLAGS := -Wall -Werror -Wpedantic -O2 -g
 CC := cc $(CFLAGS)
 
 .PHONY: clean
